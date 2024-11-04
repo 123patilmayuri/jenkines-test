@@ -1,3 +1,28 @@
-VbVDBNDIZDCACDAffeweefC
-DNKJ
-kndjJD
+stages:
+  - build
+  - package
+
+variables:
+  MODULE_PATHS: ""
+
+before_script:
+  # Get all module paths and convert them to a space-separated string
+  - export MODULE_PATHS=$(xmllint --xpath "//project/modules/module/text()" pom.xml | sed 's|^|./|g' | tr '\n' ' ')
+  - echo "Module paths to include as artifacts: $MODULE_PATHS"
+
+build:
+  stage: build
+  script:
+    - echo "Building all modules..."
+    - ./mvnw clean install
+
+package:
+  stage: package
+  dependencies:
+    - build
+  script:
+    - echo "Packaging and archiving module artifacts..."
+  artifacts:
+    paths:
+      - $MODULE_PATHS  # Dynamically include each module path
+    expire_in: 1 week
