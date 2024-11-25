@@ -27,6 +27,9 @@ package:
       - $MODULE_PATHS  # Dynamically include each module path
     expire_in: 1 week
 
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt install -y nodejs
+
 
 https://docs.gitlab.com/ee/user/project/repository/push_rules.html
 
