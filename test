@@ -27,6 +27,11 @@ package:
       - $MODULE_PATHS  # Dynamically include each module path
     expire_in: 1 week
 
+
+  OS_NAME=$(uname -s)
+                        
+         echo "Detected OS: $OS_NAME"
+=======
 curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
 sudo apt install -y nodejs
 ===============
