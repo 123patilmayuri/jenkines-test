@@ -12,6 +12,31 @@ node {
 		checkout scm
 		}
 
+
+		script {
+                    // Reading a username and password credential
+                    withCredentials([usernamePassword(credentialsId: 'my-cred-id', 
+                                                     usernameVariable: 'USERNAME', 
+                                                     passwordVariable: 'PASSWORD')]) {
+                        echo "Using Username: ${USERNAME}"
+                        // You can use the password variable, but never echo it to keep it secure
+                        sh '''
+                        echo "Executing some command with $USERNAME"
+                        '''
+                    }
+
+                    // Reading a secret text credential
+                    withCredentials([string(credentialsId: 'my-secret-text-id', variable: 'SECRET_TEXT')]) {
+                        echo "Secret Text: ${SECRET_TEXT}" // For demonstration purposes only; avoid echoing secrets in production.
+                    }
+
+                    // Reading a secret file credential
+                    withCredentials([file(credentialsId: 'my-secret-file-id', variable: 'SECRET_FILE')]) {
+                        echo "Using Secure File at: ${SECRET_FILE}"
+                        sh '''
+                        cat $SECRET_FILE # Example usage; avoid exposing file contents in logs
+                        '''
+                    }
                 
 		stage('Build_Backend_Code') {
 		echo "Running: Build_Backend_Code"
