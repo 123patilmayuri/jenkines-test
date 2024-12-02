@@ -5,6 +5,8 @@ branch_name = job[1]
 git_branch_name = branch_name.replaceAll("%2F","/")
 url_branch_name = git_branch_name.replaceAll("/","%252F")
 
+sf config set org-api-loglevel=debug
+
 node {
        try
         {
