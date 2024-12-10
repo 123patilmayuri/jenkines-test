@@ -245,3 +245,5 @@ Policy Enforcement
 Pre-Commit Hooks: Tools like pre-commit to enforce standards before code is committed.
 Policy as Code: Open Policy Agent (OPA), AWS Config
 
+
+^(PR-.*|develop|master)$
