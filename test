@@ -247,3 +247,22 @@ Policy as Code: Open Policy Agent (OPA), AWS Config
 
 
 ^(PR-.*|develop|master)$
+
+
+3. Specify Branch Filters
+In the Branch Specifier (under Advanced options):
+
+Set a pattern to detect PRs:
+text
+Copy code
+origin/pr/*
+
+Discover Other Refs:
+
++refs/pull-requests/*:refs/remotes/origin/pr/*
+
+
+
++refs/heads/*:refs/remotes/origin/* +refs/pull-requests/*:refs/remotes/origin/pr/*
++refs/heads/*: Includes all branch heads.
++refs/pull-requests/*: Includes all PR refs.
