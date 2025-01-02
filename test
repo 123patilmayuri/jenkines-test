@@ -266,3 +266,32 @@ Discover Other Refs:
 +refs/heads/*:refs/remotes/origin/* +refs/pull-requests/*:refs/remotes/origin/pr/*
 +refs/heads/*: Includes all branch heads.
 +refs/pull-requests/*: Includes all PR refs.
+
+
+stage('Checkout') {
+            steps {
+                script {
+                    // Determine the branch to checkout
+                    def branchToCheckout = params.BRANCH_NAME ?: env.BRANCH_NAME ?: 'main'
+                    
+                    echo "Checking out branch: ${branchToCheckout}"
+                    
+                    // Checkout the branch specified by the parameter or the SCM trigger
+                    checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: "*/${branchToCheckout}"]],
+                        doGenerateSubmoduleConfigurations: false,
+                        extensions: [],
+                        userRemoteConfigs: [[url: 'https://your-repo-url.git']]
+                    ])
+                }
+            }
+        }
+        stage('Build') {
+            steps {
+                echo "Building branch ${params.BRANCH_NAME ?: env.BRANCH_NAME ?: 'main'}"
+                // Add your build steps here
+            }
+        }
+    }
+}
