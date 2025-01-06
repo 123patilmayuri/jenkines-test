@@ -295,3 +295,8 @@ stage('Checkout') {
         }
     }
 }
+
+
+
+
+ - PROPERTY_VALUE=$(grep '^myProperty=' gradle.properties | cut -d'=' -f2)
