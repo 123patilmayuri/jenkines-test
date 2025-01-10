@@ -302,3 +302,9 @@ stage('Checkout') {
  - PROPERTY_VALUE=$(grep '^myProperty=' gradle.properties | cut -d'=' -f2)
 
  def currentTimestamp = new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone('UTC'))
+
+    # Get the current timestamp
+                    TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
+                    
+                    # Combine the timestamp and BUILD_ID
+                    COMBINED_VAR="${TIMESTAMP}_BUILD-${BUILD_ID}"
