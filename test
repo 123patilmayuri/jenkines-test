@@ -308,3 +308,20 @@ stage('Checkout') {
                     
                     # Combine the timestamp and BUILD_ID
                     COMBINED_VAR="${TIMESTAMP}_BUILD-${BUILD_ID}"
+
+
+
+script {
+                    // Detect if the trigger was an SCM event
+                    if (currentBuild.getBuildCauses('hudson.triggers.SCMTrigger$SCMTriggerCause').size() > 0) {
+                        // For SCM triggers
+                        echo "SCM Trigger detected. Using branch: ${env.BRANCH_NAME}"
+                        branchToCheckout = env.BRANCH_NAME // Automatically set in multibranch or SCM jobs
+                    } else {
+                        // For manual or other triggers
+                        echo "Manual trigger detected. Using branch: ${params.BRANCH_NAME}"
+                        branchToCheckout = params.BRANCH_NAME
+                    }
+
+                    echo "Branch to checkout: ${branchToCheckout}"
+                }
