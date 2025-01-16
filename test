@@ -325,3 +325,16 @@ script {
 
                     echo "Branch to checkout: ${branchToCheckout}"
                 }
+
+
+==================
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "main"'
+      variables:
+        MY_DYNAMIC_VAR: "main_branch_value"
+    - if: '$CI_COMMIT_REF_NAME == "develop"'
+      variables:
+        MY_DYNAMIC_VAR: "develop_branch_value"
+    - if: '$CI_COMMIT_REF_NAME != "main" && $CI_COMMIT_REF_NAME != "develop"'
+      variables:
+        MY_DYNAMIC_VAR: "other_branch_value"
