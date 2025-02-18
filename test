@@ -340,3 +340,13 @@ script {
         MY_DYNAMIC_VAR: "other_branch_value"
 
 - export RELEASE_VERSION=$(echo $CURRENT_VERSION | sed 's/-SNAPSHOT//')
+
+  script:
+    # Remove `-SNAPSHOT` from all pom.xml files temporarily
+    - mvn versions:set -DnewVersion=10.6.5 -DgenerateBackupPoms=false
+  artifacts:
+    paths:
+      - pom.xml
+      - "**/pom.xml
+
+mvn help:evaluate -Dexpression=project.version -q -DforceStdout
