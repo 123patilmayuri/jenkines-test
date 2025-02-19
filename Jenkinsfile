@@ -117,3 +117,7 @@ def notifyBuild(String buildStatus = 'STARTED',String thiserr) {
 } 
 	step([$class: 'WsCleanup', cleanWhenFailure: true])
 }
+curl -u username:password -o my-app.war \
+  "https://your-nexus-url/service/rest/v1/search/assets/download?repository=maven-releases&group=com.example&name=my-app&version=1.0.0&maven.extension=war"
+curl -u username:password -o my-app.war \
+  "https://your-nexus-url/service/rest/v1/search/assets/download?repository=maven-releases&group=com.example&name=my-app&version=1.0.0&maven.extension=war"
