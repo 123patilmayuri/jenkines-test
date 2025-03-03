@@ -350,3 +350,13 @@ script {
       - "**/pom.xml
 
 mvn help:evaluate -Dexpression=project.version -q -DforceStdout
+
+
+
+scan_job:
+  stage: scan
+  script:
+    - echo "Reading JSON file..."
+    - COUNT=$(jq '[.[] | select(.severity=="critical")] | length' report.json)
+    - echo "Critical count: $COUNT"
+    - if [ "$COUNT" -gt 0 ]; then exit 1; fi
