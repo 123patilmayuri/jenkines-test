@@ -369,3 +369,30 @@ trigger_downstream:
   trigger:
     project: group-name/downstream-repo  # Replace with actual repo path
     branch: main 
+
+
+stages:
+  - check_status
+
+check_service_catalog:
+  stage: check_status
+  script:
+    - |
+      PRODUCT_ID="pp-abc123xyz"  # Replace with your provisioned product ID
+
+      while true; do
+          STATUS=$(aws servicecatalog describe-provisioned-product \
+              --id "$PRODUCT_ID" \
+              --query "ProvisionedProductDetail.Status" \
+              --output text)
+
+          echo "Current Status: $STATUS"
+
+          if [[ "$STATUS" == "AVAILABLE" || "$STATUS" == "ERROR" || "$STATUS" == "TAINTED" ]]; then
+              echo "Provisioned product reached final state: $STATUS"
+              break
+          fi
+
+          sleep 10  # Wait 10 seconds before checking again
+      done
+
