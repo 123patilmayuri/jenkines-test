@@ -396,3 +396,7 @@ check_service_catalog:
           sleep 10  # Wait 10 seconds before checking again
       done
 
+
+================================
+
+powershell -Command "Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Microsoft\\NET Framework Setup\\NDP\\v4\\Full' | Select-O
