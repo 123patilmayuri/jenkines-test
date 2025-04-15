@@ -400,3 +400,27 @@ check_service_catalog:
 ================================
 
 powershell -Command "Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Microsoft\\NET Framework Setup\\NDP\\v4\\Full' | Select-O
+
+
+
+---------------
+stages:
+  - build
+
+build:
+  stage: build
+  tags:
+    - windows  # Make sure this matches your Windows runner's tag
+  script:
+    # 1. Download nuget.exe
+    - powershell -Command "Invoke-WebRequest https://dist.nuget.org/win-x86-commandline/latest/nuget.exe -OutFile nuget.exe"
+
+    # 2. Use NuGet to install MSBuildTasks into a local folder
+    - .\nuget.exe install MSBuildTasks -OutputDirectory packages
+
+    # 3. (Optional) Show installed packages
+    - dir packages
+
+    # 4. Build the project using MSBuild (you may need to adjust the path)
+    - '"C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\MSBuild.exe" MyProject.csproj /p:Configuration=Release'
+
