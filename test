@@ -424,3 +424,13 @@ build:
     # 4. Build the project using MSBuild (you may need to adjust the path)
     - '"C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\MSBuild.exe" MyProject.csproj /p:Configuration=Release'
 
+=====================
+
+git submodule add https://gitlab.com/<your-group>/<config-repo>.git config
+
+[submodule "config"]
+    path = config
+    url = https://gitlab.com/your-group/config-repo.git
+
+before_script:
+  - git submodule update --init --recursive
