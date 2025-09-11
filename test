@@ -27,7 +27,7 @@ package:
       - $MODULE_PATHS  # Dynamically include each module path
     expire_in: 1 week
 
-
+https://app.eraser.io/workspace/UzsrSsMbwVbILjEPGUvs?origin=share&elements=zeCbQVA20P3i9URbhcN5Sg
   OS_NAME=$(uname -s)
                         
          echo "Detected OS: $OS_NAME"
