@@ -118,3 +118,48 @@ Users may encounter access issues when their privileges are not configured corre
 
 Conclusion 
 Implementing least privilege access control policies is crucial for maintaining a robust security posture on Linux systems. By understanding the concept of least privilege access control, the role of Linux systems in access control, and following best practices, organizations can enhance their security and mitigate the risks associated with unauthorized access or user errors. Regular monitoring, training, and addressing common implementation issues are essential elements for a successful least privilege access control implementation. By adopting these strategies and adhering to industry best practices, organizations can create a secure environment that protects sensitive information and digital assets from potential threats.
+What is sshd_config?
+
+File:
+
+/etc/ssh/sshd_config
+
+
+It configures the OpenSSH daemon (sshd), which handles all incoming SSH connections.
+
+It controls who can log in, what they can do immediately after login, and how secure the connection is.
+
+
+
+
+======================
+What is sshd_config?
+
+It’s the configuration file for the OpenSSH daemon (sshd).
+
+Location (default):
+
+/etc/ssh/sshd_config
+
+
+This file is read automatically when the SSH service starts (or restarts).
+
+Every Linux distro that ships with OpenSSH (Ubuntu, RHEL, CentOS, Debian, Amazon Linux, etc.) will have it by default.
+
+🔹 What does it control?
+
+It’s not an extra package — it’s part of the SSH server itself.
+
+Who can log in (users, groups).
+
+Authentication methods (password, public key, certificates, MFA).
+
+Whether root can log in.
+
+Which commands a user is forced to run.
+
+Network features (port forwarding, X11, tunneling).
+
+Chroot jails.
+
+Session timeouts.
