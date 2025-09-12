@@ -434,3 +434,314 @@ git submodule add https://gitlab.com/<your-group>/<config-repo>.git config
 
 before_script:
   - git submodule update --init --recursive
+
+
+================
+ Secure Access Control Strategies for Linux Systems
+Setting Up User Accounts and Groups 
+The next step involves creating user accounts and groups based on job roles and responsibilities. Assign each user the minimum privileges necessary to carry out their tasks effectively. This principle, known as the principle of least privilege, ensures that users have access only to the resources they need and minimizes the potential impact of a compromised account.
+When creating user accounts, it is important to enforce strong password policies. This includes requiring complex passwords, regularly expiring passwords, and implementing multi-factor authentication where possible. These measures help to prevent unauthorized access to user accounts and protect sensitive information.
+Furthermore, regularly review and audit user accounts and group memberships to ensure that access rights are still appropriate. Remove any unnecessary privileges or accounts that are no longer required, reducing the potential attack surface.
+
+
+e user accounts and groups are set up, it is crucial to configure permissions and access controls for files, directories, and system resources. Regularly review and update permissions, ensuring that only authorized users have access to sensitive information.
+Implementing a strong file and directory permission structure is essential. Use the principle of least privilege to grant read, write, and execute permissions to files and directories based on user roles and responsibilities. This helps to prevent unauthorized modification or access to critical system files and sensitive data.
+In addition to traditional permissions, consider implementing access control lists (ACLs) for finer-grained access control when necessary. ACLs allow you to define access rights for specific users or groups on individual files or directories, providing more flexibility in managing access privileges.
+
+
+1.	Regular Users: Regular users are non-privileged accounts that have limited access to the system. They can perform tasks within their own home directories and use system resources, but they cannot make changes that affect the entire system.
+
+
+
+
+
+
+
+Step 1: Create the user
+sudo superadd -m -s /bin/rbash ruser
+sudo passwd ruser
+Step 2: Create private bin for ruser
+
+sudo ln -s /bin/bash /bin/rbash
+ls -l /bin/rbash
+Step 3: Add only allowed commands
+
+cd /home/ruser/bin
+ln -s /bin/ls ls
+ln -s /bin/cat cat
+ln -s /bin/systemctl systemctl
+
+🔹 Step 4: Lock PATH
+Set PATH so ruser only sees their own bin:
+echo 'PATH=$HOME/bin' | sudo tee -a /home/ruser/.bash_profile
+echo 'PATH=$HOME/bin' | sudo tee -a /home/ruser/.bashrc
+
+Step 5: Configure sudoers
+
+sudo visudo
+
+Cmnd_Alias APP_LS = /bin/ls /app
+Cmnd_Alias APP_LOGS = /bin/cat /app/logs/*
+Cmnd_Alias TOMCAT = /bin/systemctl restart tomcat
+
+ruser ALL=(ALL) NOPASSWD: APP_LS, APP_LOGS, TOMCAT
+
+
+🔹 Step 6: Set ruser’s shell to rbash
+sudo usermod -s /bin/rbash ruser
+
+Verify
+getent passwd ruser
+
+[ruser@ip-172-31-2-25 ~]$ mkdir test
+-rbash: mkdir: command not found
+
+
+[ruser@ip-172-31-2-25 ~]$ rm -r /tmp/systemd-private-7c1d31a51e984a90869f9391d4715834-chronyd.service-2yGM5W/
+-rbash: rm: command not found
+
+====================
+sudo useradd -m -s /bin/bash test
+passwd test
+
+
+How this enforces least privilege
+
+User can only run commands you symlinked.
+
+They cannot access /bin/ls or /usr/bin/cat directly, because rbash blocks using absolute paths (e.g., /bin/ls).
+
+They cannot reset $PATH, because rbash forbids it.
+
+Combined with sudoers, they can only elevate privilege for the exact commands you listed.
+
+
+Steps to Lock Down PATH
+
+sudo chsh -s /bin/rbash test
+sudo mkdir -p /home/test/bin
+sudo chown test:test /home/test/bin
+
+
+cd /home/test/bin
+ln -s /bin/ls ls
+ln -s /bin/cat cat
+ln -s /bin/systemctl systemctl
+
+
+/home/test/.bash_profile
+PATH=$HOME/bin
+export PATH
+-========================
+
+
+What is a Restricted Shell (rbash)?
+
+A restricted shell is just a normal shell (like bash), but started in a restricted mode.
+On Linux, this is usually done by running bash as rbash (a symlink).
+
+When in restricted mode, the shell blocks risky features so the user cannot escape their jail.
+
+==============What is sudoers?
+
+The sudoers file is the configuration file that controls who can run what commands as root (or another user) on a Linux/Unix system.
+
+Purpose of sudoers
+
+It defines:
+
+Which users (or groups) can use sudo.
+
+Which commands they are allowed to run.
+
+Whether they need to enter a password or not.
+
+Whether they can run commands as root or as another user
+
+If you want user alice to run all commands as root:
+
+alice ALL=(ALL) ALL
+
+
+If you want user bob to run systemctl restart nginx without password:
+
+bob ALL=(ALL) NOPASSWD: /bin/systemctl restart nginx
+
+
+Now bob can do:
+
+sudo systemctl restart nginx
+
+
+
+=========================
+
+Steps to Archive a Project:
+Go to your project in GitLab.
+Navigate to Settings > General.
+Scroll down to the Advanced section.
+Click Archive project.
+Effects of Archiving:
+
+Users can still view the project bu
+
+
+Jira autocreatore GitLab component created and beta testing progress
+Given Demo - to EE Team
+Workshop conducted within team for GitLab Overview 
+Working On Conduqt-INfra Mass Afflunebt(1-component) CI
+Geneva Monaco - POC 
+
+
+
+
+sudo passwd gitlabuser
+2. Give sudo access only to allowed commands
+Edit the sudoers file safely:
+
+bash
+Copy code
+sudo visudo
+Add an entry at the bottom, for example:
+
+swift
+Copy code
+
+Steps to Create a Restricted Privileged SSH User
+1. Create a new user
+sudo useradd -m -s /bin/bash gitlabuser
+
+
+2. Give sudo access only to allowed commands
+
+Edit the sudoers file safely:
+
+sudo visudo
+
+gitlabuser ALL=(ALL) NOPASSWD: /usr/bin/systemctl restart nginx, \
+                                /usr/bin/systemctl status nginx, \
+                                /usr/bin/tail /var/log/nginx/error.log
+								
+								
+				
+# Define allowed commands as aliases
+Cmnd_Alias APP_LS = /bin/ls /app
+Cmnd_Alias APP_LOGS = /bin/cat /app/logs/*
+Cmnd_Alias TOMCAT = /bin/systemctl restart tomcat, /bin/systemctl status tomcat
+
+# Allow only these commands for gitlabuser
+gitlabuser ALL=(ALL) NOPASSWD: APP_LS, APP_LOGS, TOMCAT
+
+				
+				
+				
+
+su - gitlabuser				
+
+gitlabuser ALL=(ALL) NOPASSWD: /usr/bin/systemctl restart nginx, \
+                                /usr/bin/systemctl status nginx, \
+                                /usr/bin/tail /var/log/nginx/error.log
+
+
+sudo -i -u gitlabuser
+
+
+[gitlabuser@ip-172-31-2-25 ~]$ systemctl stop nginx
+==== AUTHENTICATING FOR org.freedesktop.systemd1.manage-units ====
+Authentication is required to stop 'nginx.service'.
+Authenticating as: Super User (root)
+Password:
+polkit-agent-helper-1: pam_authenticate failed: Authentication failure
+==== AUTHENTICATION FAILED ====
+Failed to stop nginx.service: Access denied
+See system logs and 'systemctl status nginx.service' for details.
+[gitlabuser@ip-172-31-2-25 ~]$
+[gitlabuser@ip-172-31-2-25 ~]$
+
+will work - sudo systemctl restart nginx
+
+
+
+🔹 Solutions (choose depending on how strict you want to be)
+✅ Option 1: Only restrict privileged commands (recommended)
+
+Keep gitlabuser as a normal account, but control privileged actions through sudoers.
+
+User will always be able to ls /tmp or echo hello — that’s expected.
+
+This is how least privilege is usually implemented in enterprises.
+
+
+sudo chsh -s /bin/rbash gitlabuser
+
+
+sudo mkdir -p /home/gitlabuser/bin
+sudo chown gitlabuser:gitlabuser /home/gitlabuser/bin
+
+cd /home/gitlabuser/bin
+ln -s /bin/ls ls
+ln -s /bin/cat cat
+ln -s /bin/systemctl systemctl
+
+
+PATH=$HOME/bin
+export PATH
+
+
+chsh -s /bin/rbash gitlabuser
+mkdir -p /home/gitlabuser/bin
+ln -s /bin/ls /home/gitlabuser/bin/ls
+
+
+
+
+sudo mkdir -p /home/user1/bin
+sudo ln -s /bin/ls /home/user1/bin/ls
+sudo ln -s /bin/cat /home/user1/bin/cat
+sudo ln -s /bin/systemctl /home/user1/bin/systemctl
+echo "PATH=$HOME/bin" | sudo tee -a /home/user1/.bash_profile
+
+
+
+PATH=$HOME/bin
+export PATH
+
+
+Steps to Lock Down PATH
+Change shell to restricted bash
+sudo chsh -s /bin/rbash test
+
+============================================================
+sudo useradd -m -s /bin/bash test
+passwd test
+
+
+How this enforces least privilege
+
+User can only run commands you symlinked.
+
+They cannot access /bin/ls or /usr/bin/cat directly, because rbash blocks using absolute paths (e.g., /bin/ls).
+
+They cannot reset $PATH, because rbash forbids it.
+
+Combined with sudoers, they can only elevate privilege for the exact commands you listed.
+
+
+Steps to Lock Down PATH
+
+sudo chsh -s /bin/rbash test
+sudo mkdir -p /home/test/bin
+sudo chown test:test /home/test/bin
+
+
+cd /home/test/bin
+ln -s /bin/ls ls
+ln -s /bin/cat cat
+ln -s /bin/systemctl systemctl
+
+
+/home/test/.bash_profile
+PATH=$HOME/bin
+export PATH
+
+
