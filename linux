@@ -223,3 +223,12 @@ Command not allowed!
 C:\Users\MVMA>ssh mayuri@13.203.203.90 "cat /etc/passwd"
 mayuri@13.203.203.90's password:
 Command not allowed!
+
+###############Allowed
+C:\Users\MVMA>ssh mayuri@13.203.203.90 "whoami"
+mayuri@13.203.203.90's password:
+mayuri
+
+C:\Users\MVMA>ssh mayuri@13.203.203.90 "uptime"
+mayuri@13.203.203.90's password:
+ 06:55:07 up 1 day, 19:55,  4 users,  load average: 0.08, 0.02, 0.01
