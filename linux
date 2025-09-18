@@ -277,3 +277,16 @@ Sep 18 08:34:07 ip-172-31-2-25.ap-south-1.compute.internal systemd[1]: Started n
 C:\Users\MVMA>ssh mayuri@13.203.203.90 "sudo systemctl stop nginx"
 mayuri@13.203.203.90's password:
 Command not allowed!
+
+
+case "$SSH_ORIGINAL_COMMAND" in
+    "ls") /bin/ls ;;
+    "ssh"*) /usr/bin/ssh ${SSH_ORIGINAL_COMMAND#ssh } ;;
+    "pwd") /bin/pwd ;;
+    "whoami") /usr/bin/whoami ;;
+    "date") /bin/date ;;
+    "uptime") /usr/bin/uptime ;;
+    "sudo systemctl restart nginx") /usr/bin/sudo /bin/systemctl restart nginx ;;
+    "sudo systemctl status nginx") /usr/bin/sudo /bin/systemctl status nginx ;;
+    *) echo "Command not allowed!"; exit 1 ;;
+esac
