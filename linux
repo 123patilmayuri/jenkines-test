@@ -163,3 +163,63 @@ Network features (port forwarding, X11, tunneling).
 Chroot jails.
 
 Session timeouts.
+
+-==============================
+Summary:
+
+rbash or restricted shell → prevents free navigation.
+sudoers restrictions → allow only specific commands.
+ForceCommand (sshd) → useful for automation or single-command users.
+
+sudoers → Let user run only specific commands with sudo.
+rbash → Restrict available binaries by controlling PATH.
+sshd_config (ForceCommand) → Force execution of only one script on SSH login.
+
+
+sudo -i -u ruser
+➡️ You are switching locally to the user.
+➡️ In this case, sshd_config ForceCommand does not apply at all, because that only triggers when ruser logs in via SSH
+
+
+
+1. sudo useradd -m mayuri && sudo passwd mayuri
+	-> mayuripass
+	
+1.1 sudo sshd -T | grep passwordauthentication
+	
+	
+2. sudo vi /etc/ssh/sshd_config
+	Match User mayuri
+    ForceCommand /usr/local/bin/allowed-script.sh
+	
+	#!/bin/bash
+# Allowed commands for ruser (only these 5)
+
+case "$SSH_ORIGINAL_COMMAND" in
+    "ls") /bin/ls ;;
+    "ssh"*) /usr/bin/ssh ${SSH_ORIGINAL_COMMAND#ssh } ;;
+    "pwd") /bin/pwd ;;
+    "whoami") /usr/bin/whoami ;;
+    "date") /bin/date ;;
+    "uptime") /usr/bin/uptime ;;
+    *) echo "Command not allowed!"; exit 1 ;;
+esac
+
+3. sudo chmod +x /usr/local/bin/allowed-script.sh
+
+3. sudo systemctl restart sshd
+
+
+C:\Users\MVMA>ssh mayuri@13.203.203.90 "mkdir test"
+mayuri@13.203.203.90's password:
+Command not allowed!
+
+
+C:\Users\MVMA>ssh mayuri@13.203.203.90 "echo test"
+mayuri@13.203.203.90's password:
+Command not allowed!
+
+
+C:\Users\MVMA>ssh mayuri@13.203.203.90 "cat /etc/passwd"
+mayuri@13.203.203.90's password:
+Command not allowed!
