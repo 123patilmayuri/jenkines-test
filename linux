@@ -232,3 +232,48 @@ mayuri
 C:\Users\MVMA>ssh mayuri@13.203.203.90 "uptime"
 mayuri@13.203.203.90's password:
  06:55:07 up 1 day, 19:55,  4 users,  load average: 0.08, 0.02, 0.01
+
+
+-----------------------
+User: ruser
+
+Host: ALL (all machines)
+
+Run as: ALL users (can run as root)
+
+Password prompt: Disabled (NOPASSWD)
+
+Allowed commands: Only /bin/systemctl restart nginx and /bin/systemctl status nginx
+
+This is a least-privilege sudo rule — the user can only restart or check nginx, nothing else.
+
+
+Edit sudoers:
+mayuri ALL=(ALL) NOPASSWD: /bin/systemctl restart nginx, /bin/systemctl status nginx
+
+
+C:\Users\MVMA>ssh mayuri@13.203.203.90 "sudo systemctl status nginx"
+mayuri@13.203.203.90's password:
+● nginx.service - The nginx HTTP and reverse proxy server
+     Loaded: loaded (/usr/lib/systemd/system/nginx.service; disabled; preset: disabled)
+     Active: active (running) since Thu 2025-09-18 08:34:07 UTC; 51s ago
+ Invocation: dbd99c45d0ed4e48a530235523971cb0
+    Process: 20658 ExecStartPre=/usr/bin/rm -f /run/nginx.pid (code=exited, status=0/SUCCESS)
+    Process: 20660 ExecStartPre=/usr/sbin/nginx -t (code=exited, status=0/SUCCESS)
+    Process: 20662 ExecStart=/usr/sbin/nginx (code=exited, status=0/SUCCESS)
+   Main PID: 20663 (nginx)
+      Tasks: 2 (limit: 5687)
+     Memory: 2.1M (peak: 2.7M)
+        CPU: 34ms
+     CGroup: /system.slice/nginx.service
+             ├─20663 "nginx: master process /usr/sbin/nginx"
+             └─20665 "nginx: worker process"
+
+Sep 18 08:34:07 ip-172-31-2-25.ap-south-1.compute.internal systemd[1]: Starting nginx.service - The nginx HTTP and reverse proxy server...
+Sep 18 08:34:07 ip-172-31-2-25.ap-south-1.compute.internal nginx[20660]: nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+Sep 18 08:34:07 ip-172-31-2-25.ap-south-1.compute.internal nginx[20660]: nginx: configuration file /etc/nginx/nginx.conf test is successful
+Sep 18 08:34:07 ip-172-31-2-25.ap-south-1.compute.internal systemd[1]: Started nginx.service - The nginx HTTP and reverse proxy server.
+
+C:\Users\MVMA>ssh mayuri@13.203.203.90 "sudo systemctl stop nginx"
+mayuri@13.203.203.90's password:
+Command not allowed!
