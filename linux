@@ -290,3 +290,52 @@ case "$SSH_ORIGINAL_COMMAND" in
     "sudo systemctl status nginx") /usr/bin/sudo /bin/systemctl status nginx ;;
     *) echo "Command not allowed!"; exit 1 ;;
 esac
+
+
+
+------------------
+
+rbash restricts interactive shell
+
+ForceCommand enforces restrictions on remote commands over SSH
+
+
+Since /bin/rbash only restricts interactive shells, the restriction does not apply to remote commands.
+sudo usermod -s /bin/rbash rtestuser
+Step 3: Create a bin directory for allowed commands
+
+ sudo mkdir -p /home/rtestuser/bin
+sudo chown rtestuser:rtestuser /home/ruser/bin
+
+step 4: Copy or symlink allowed commands
+
+ln -s /bin/ls /home/rtestuser/bin/ls
+ln -s /bin/pwd /home/rtestuser/bin/pwd
+ln -s /usr/bin/whoami /home/rtestuser/bin/whoami
+ln -s /bin/date /home/rtestuser/bin/date
+
+Step 5: Lock the PATH
+Edit .bash_profile or .bashrc for the user:
+PATH=$HOME/bin
+export PATH
+
+
+sudo usermod -s /bin/rbash ruser
+
+To virify - getent passwd rtestuser
+
+
+[rtestuser@ip-172-31-2-25 ~]$ mkdir testk
+-rbash: mkdir: command not found
+[rtestuser@ip-172-31-2-25 ~]$ cat /etc/passwd
+-rbash: cat: command not found
+
+
+[rtestuser@ip-172-31-2-25 ~]$ cat /etc/passwd
+-rbash: cat: command not found
+
+
+C:\Users\MVMA>ssh rtestuser@13.203.203.90 "cat /etc/passwd"
+rtestuser@13.203.203.90's password:
+root:x:0:0:Super User:/root:/bin/bash
+bin:x:1:1:bin:/bin:/usr/sbin/nologin
