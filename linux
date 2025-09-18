@@ -339,3 +339,30 @@ C:\Users\MVMA>ssh rtestuser@13.203.203.90 "cat /etc/passwd"
 rtestuser@13.203.203.90's password:
 root:x:0:0:Super User:/root:/bin/bash
 bin:x:1:1:bin:/bin:/usr/sbin/nologin
+
+
+Interactive Shell
+
+You log in with SSH and get a prompt (like [ec2-user@server]$).
+You can type commands one by one (ls, pwd, whoami …).
+
+It’s like sitting at the server’s keyboard.
+You land in the shell and then type commands.
+
+ssh ruser@EC2_IP
+
+
+Remote (Non-interactive) Shell
+
+You run a single command directly over SSH, without getting a prompt.
+
+SSH runs that command, sends the output back, and closes the session.
+
+No chance to type more commands afterward.
+
+ssh ruser@EC2_IP "ls /home"
+
+
+Interactive shell → you log in and talk to the server step by step.
+
+Remote shell → you send one command, server does it, and closes.
