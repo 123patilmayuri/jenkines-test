@@ -366,3 +366,59 @@ ssh ruser@EC2_IP "ls /home"
 Interactive shell → you log in and talk to the server step by step.
 
 Remote shell → you send one command, server does it, and closes.
+
+
+
+
+
+
+
+
+--------------------
+
+#!/bin/bash
+
+case "$SSH_ORIGINAL_COMMAND" in
+    # ls with arguments
+    ls*) /bin/ls ${SSH_ORIGINAL_COMMAND#ls} ;;
+
+    # ssh with arguments (for proxying)
+    ssh*) /usr/bin/ssh ${SSH_ORIGINAL_COMMAND#ssh } ;;
+
+    # simple commands without args
+    "pwd") /bin/pwd ;;
+    "whoami") /usr/bin/whoami ;;
+    "uptime") /usr/bin/uptime ;;
+
+    # date with optional args (e.g. date +%Y-%m-%d)
+    date*) /bin/date ${SSH_ORIGINAL_COMMAND#date} ;;
+
+    # systemctl only for nginx (safe)
+    "sudo systemctl restart nginx") /usr/bin/sudo /bin/systemctl restart nginx ;;
+    "sudo systemctl status nginx")  /usr/bin/sudo /bin/systemctl status nginx ;;
+    "sudo systemctl stop nginx")    /usr/bin/sudo /bin/systemctl stop nginx ;;
+
+    # fallback
+    *) echo "Command not allowed!"; exit 1 ;;
+esac
+
+
+C:\Users\MVMA>ssh mayuri@13.204.66.103 "pwd -h"
+mayuri@13.204.66.103's password:
+Command not allowed!
+
+
+C:\Users\MVMA>ssh mayuri@13.204.66.103 "pwd"
+mayuri@13.204.66.103's password:
+/home/mayuri
+
+
+C:\Users\MVMA>ssh mayuri@13.204.66.103 "date +%Y-%m-%d"
+mayuri@13.204.66.103's password:
+2025-09-23
+
+C:\Users\MVMA>ssh mayuri@13.204.66.103 "ls -al"
+mayuri@13.204.66.103's password:
+total 16
+drwx------.  3 mayuri mayuri  95 Sep 18 06:37 .
+drwxr-xr-x. 12 root   root   160 Sep 18 09:36 ..
