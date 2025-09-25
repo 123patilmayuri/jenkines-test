@@ -422,3 +422,42 @@ mayuri@13.204.66.103's password:
 total 16
 drwx------.  3 mayuri mayuri  95 Sep 18 06:37 .
 drwxr-xr-x. 12 root   root   160 Sep 18 09:36 ..
+
+
+
+
+==================
+
+
+#!/bin/bash
+
+# Variables
+JUMPBOX_USER="jumpuser"
+JUMPBOX_HOST="jumpbox.example.com"
+JUMPBOX_PASS="jumpbox_password"
+
+TARGET_USER="appuser"
+TARGET_HOST="targethost.example.com"
+
+NEXUS_URL="http://nexus.example.com/repository/releases/com/app/myapp/1.0.0/myapp-1.0.0.war"
+WAR_NAME="myapp.war"
+TOMCAT_DIR="/opt/tomcat/webapps"
+
+# Command to run on target host
+TARGET_COMMANDS="
+  echo 'Downloading WAR from Nexus...'
+  wget -O /tmp/${WAR_NAME} ${NEXUS_URL} &&
+  echo 'Deploying WAR to Tomcat...' &&
+  sudo rm -rf ${TOMCAT_DIR}/${WAR_NAME} ${TOMCAT_DIR}/${WAR_NAME%.war} &&
+  sudo cp /tmp/${WAR_NAME} ${TOMCAT_DIR}/ &&
+  echo 'Restarting Tomcat service...' &&
+  sudo systemctl restart tomcat &&
+  echo 'Deployment successful!'
+"
+
+# SSH via jumpbox to target
+sshpass -p \"$JUMPBOX_PASS\" ssh -o StrictHostKeyChecking=no ${JUMPBOX_USER}@${JUMPBOX_HOST} \
+  "ssh -o StrictHostKeyChecking=no ${TARGET_USER}@${TARGET_HOST} \"${TARGET_COMMANDS}\""
+
+
+StrictHostKeyChecking=no is an SSH client option that tells SSH not to prompt you when connecting to a server for the first time, and instead automatically accept the server’s host key.
