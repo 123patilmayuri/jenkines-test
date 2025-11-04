@@ -1,0 +1,129 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  Deploy API Gateway from an OpenAPI spec stored in S3.
+  Creates RestApi (from OpenAPI), Deployment, Stage, DomainName (regional),
+  BasePathMapping and optional Route53 alias record.
+
+Parameters:
+  OpenApiS3Bucket:
+    Type: String
+    Description: S3 bucket that contains the OpenAPI spec (openapi.yml)
+  OpenApiS3Key:
+    Type: String
+    Description: S3 key (path) to the OpenAPI spec (e.g. apis/openapi.yml)
+  StageName:
+    Type: String
+    Default: dev
+    Description: Deployment stage name (e.g. dev, staging, prod)
+  ApiName:
+    Type: String
+    Default: MyOpenApiGateway
+    Description: Logical name for the API Gateway REST API
+  DomainName:
+    Type: String
+    Description: Custom domain to map to the API (e.g. api.example.com)
+  CertificateArn:
+    Type: String
+    Description: ACM certificate ARN for the custom domain (must be in same region for regional endpoints)
+  BasePath:
+    Type: String
+    Default: ""
+    Description: Base path for mapping (leave empty for root)
+  HostedZoneId:
+    Type: String
+    Default: ""
+    Description: (Optional) Route53 Hosted Zone ID to create an alias A record. Leave empty to skip creating the DNS record.
+
+Conditions:
+  HasBasePath: !Not [ !Equals [ !Ref BasePath, "" ] ]
+  CreateRoute53Record: !Not [ !Equals [ !Ref HostedZoneId, "" ] ]
+
+Resources:
+
+  # Create API Gateway REST API from OpenAPI spec in S3
+  ApiGatewayRestApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: !Ref ApiName
+      Description: !Sub "API created from OpenAPI spec ${OpenApiS3Key} in bucket ${OpenApiS3Bucket}"
+      BodyS3Location:
+        Bucket: !Ref OpenApiS3Bucket
+        Key: !Ref OpenApiS3Key
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+
+  # Deployment resource (create a deployment resource - Stage resource will reference it)
+  ApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn: ApiGatewayRestApi
+    Properties:
+      RestApiId: !Ref ApiGatewayRestApi
+      Description: !Sub "Deployment of ${ApiName} from OpenAPI spec"
+    # Use a timestamp-based logical update token to force new deployment on template changes
+    Metadata:
+      DeployTimestamp: !Ref "AWS::NoValue"
+
+  # Stage resource - references the deployment so we can update stage by updating Deployment resource
+  ApiStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      StageName: !Ref StageName
+      Description: !Sub "Stage ${StageName} for ${ApiName}"
+      RestApiId: !Ref ApiGatewayRestApi
+      DeploymentId: !Ref ApiDeployment
+      MethodSettings:
+        - DataTraceEnabled: false
+          HttpMethod: "*"
+          LoggingLevel: INFO
+          ResourcePath: "/*"
+          MetricsEnabled: true
+
+  # API Gateway Domain Name (Regional)
+  ApiDomainName:
+    Type: AWS::ApiGateway::DomainName
+    Properties:
+      DomainName: !Ref DomainName
+      RegionalCertificateArn: !Ref CertificateArn
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+
+  # Base path mapping to bind the domain to the API and stage
+  ApiBasePathMapping:
+    Type: AWS::ApiGateway::BasePathMapping
+    Properties:
+      DomainName: !Ref DomainName
+      RestApiId: !Ref ApiGatewayRestApi
+      Stage: !Ref StageName
+      BasePath: !If [ HasBasePath, !Ref BasePath, !Ref "AWS::NoValue" ]
+
+  # Optional Route53 Alias record to point your domain to the API's regional target
+  # NOTE: For regional APIs, alias target uses the regional domain name and hosted zone id from ApiDomainName attributes
+  ApiDomainRecord:
+    Type: AWS::Route53::RecordSet
+    Condition: CreateRoute53Record
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Ref DomainName
+      Type: A
+      AliasTarget:
+        DNSName: !GetAtt ApiDomainName.RegionalDomainName
+        HostedZoneId: !GetAtt ApiDomainName.RegionalHostedZoneId
+
+Outputs:
+  RestApiId:
+    Description: "API Gateway RestApiId"
+    Value: !Ref ApiGatewayRestApi
+
+  StageInvokeUrl:
+    Description: "Invoke URL for the stage"
+    Value: !Sub "https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/${StageName}"
+
+  CustomDomain:
+    Description: "Custom domain"
+    Value: !Ref DomainName
+
+  DomainRegionalDomainName:
+    Description: "Regional domain name created for the custom domain"
+    Value: !GetAtt ApiDomainName.RegionalDomainName
