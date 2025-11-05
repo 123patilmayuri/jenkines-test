@@ -1,0 +1,38 @@
+🚀 Steps to Deploy from GitLab to Ge using Automated Pipeline
+1. Prepare the Environment
+
+Before pipeline setup, ensure the following:
+
+✅ Access to Gen servers or environment (SSH, VPN, or cloud endpoint)
+
+✅ Deployment credentials (SSH key, service account, or API token)
+
+✅ GitLab Runner installed and registered (can be shell, SSH, or Kubernetes executor)
+
+✅ Deployment target (e.g., EC2 instance, on-prem VM, or Kubernetes cluster in Gen)
+
+4. Secure Access to Gen
+
+If the target is on-prem in Gen, ensure:
+
+GitLab Runner’s IP is whitelisted in the firewall.
+
+SSH key added to /home/<user>/.ssh/authorized_keys on the target host.
+
+
+5. Monitor & Verify Deployment
+
+After pipeline runs:
+
+Check GitLab CI/CD Job Logs for success confirmation.
+
+Validate the application is reachable at its Gen endpoint.
+
+Optionally, use a post-deploy script to:
+
+Run health checks
+
+Send Slack/email notifications
+
+Rollback if failed
+If the target is AWS Europe (Gen region) or similar, configure via IAM role or API credentials instead of SSH.
