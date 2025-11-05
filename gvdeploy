@@ -1,3 +1,5 @@
+here’s a comprehensive step-by-step outline for deploying an application from GitLab to an on-premises gv data center (or a private cloud region) using an automated CI/CD pipeline, including network setup, credential management, and user configuration.
+
 🚀 Steps to Deploy from GitLab to Ge using Automated Pipeline
 1. Prepare the Environment
 
