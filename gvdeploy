@@ -38,3 +38,89 @@ Send Slack/email notifications
 
 Rollback if failed
 If the target is AWS Europe (Gen region) or similar, configure via IAM role or API credentials instead of SSH.
+
+
+
+2. Raise the R3 Request
+
+Log in to your organization’s R3 (Resource Request/Reservation) portal or ITSM tool.
+
+Create a new request for server provisioning.
+
+Fill in:
+
+Project name or cost center
+
+Host type (Jump Host / Target Host)
+
+Environment and region (e.g., ap-south-1, us-east-1)
+
+Network details (VPC, subnet, etc.)
+
+Access group or AD group for login permissions
+
+
+
+Jump Host Creation
+
+Request the Jump Host (also known as Bastion Host) first:
+
+Typically deployed in a public subnet with a public IP.
+
+Attach a restricted security group allowing SSH/RDP access only from authorized IPs or VPN.
+
+Ensure IAM roles, keys, or AD credentials are configured securely.
+
+Tag it clearly as a Jump/Bastion Host.
+
+
+
+. Validation and Testing
+
+After provisioning:
+
+Log in to the Jump Host using SSH or RDP.
+
+From Jump Host, attempt to connect to the Target Host.
+
+Verify:
+
+Network connectivity (ping/SSH/RDP)
+
+Permissions and user access
+
+Monitoring and logging agents are running
+
+
+Infrastructure and Network Prerequisites
+✅ 1.1. Connectivity Setup
+
+Ensure VPN or Direct Connect between:
+
+GitLab Runner (cloud or shared) and
+
+Geneva data center network.
+
+Open the required firewall ports:
+
+TCP 22 → for SSH connections
+
+TCP 443/80 → for app deployment or monitoring endpoints
+
+TCP 5000+ → if using Docker private registry or app-specific ports.
+
+Add GitLab Runner’s IP to the Geneva firewall whitelist.
+
+Ensure DNS resolution for internal hosts:
+
+e.g., app-geneva.internal.company.com
+
+✅ 1.2. Target Host Configuration
+
+Create dedicated Linux target host(s) (VMs or bare metal):
+
+Example: geneva-app-01, geneva-db-01
+
+Recommended OS: Amazon Linux 2, RHEL 8, or Ubuntu 22.04 LTS
+
+Install required base packages:
