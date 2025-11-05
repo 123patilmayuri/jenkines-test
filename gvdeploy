@@ -99,7 +99,7 @@ Ensure VPN or Direct Connect between:
 
 GitLab Runner (cloud or shared) and
 
-Geneva data center network.
+Gv data center network.
 
 Open the required firewall ports:
 
@@ -109,18 +109,23 @@ TCP 443/80 → for app deployment or monitoring endpoints
 
 TCP 5000+ → if using Docker private registry or app-specific ports.
 
-Add GitLab Runner’s IP to the Geneva firewall whitelist.
+Add GitLab Runner’s IP to the Gv firewall whitelist.
 
 Ensure DNS resolution for internal hosts:
 
-e.g., app-geneva.internal.company.com
+e.g., app-Gv.internal.company.com
 
 ✅ 1.2. Target Host Configuration
 
 Create dedicated Linux target host(s) (VMs or bare metal):
 
-Example: geneva-app-01, geneva-db-01
+Example: Gv-app-01, Gv-db-01
 
 Recommended OS: Amazon Linux 2, RHEL 8, or Ubuntu 22.04 LTS
 
 Install required base packages:
+
+
+
+Ensure a secure network connection between the GitLab Runner and the Gv on-prem environment using either VPN (encrypted internet tunnel) or Direct Connect (dedicated private link).
+This allows the CI/CD pipeline to access Gv servers safely without exposing them to the public internet.
