@@ -129,3 +129,9 @@ Install required base packages:
 
 Ensure a secure network connection between the GitLab Runner and the Gv on-prem environment using either VPN (encrypted internet tunnel) or Direct Connect (dedicated private link).
 This allows the CI/CD pipeline to access Gv servers safely without exposing them to the public internet.
+
+An F5 Load Balancer distributes incoming traffic across multiple backend servers to improve availability, scalability, and security.
+A jump box (bastion host) acts as a secure gateway for administrative access to internal systems.
+
+Created separate user accounts for accessing the Jump Box and the Target Host within the Geneva on-prem environment.
+This access is required to enable secure CI/CD deployments and controlled administrative activities through the GitLab pipeline.
