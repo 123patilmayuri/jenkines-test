@@ -1,7 +1,7 @@
 stages:
   - build
   - package
-
+\
 variables:
   MODULE_PATHS: ""
 
