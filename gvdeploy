@@ -125,7 +125,7 @@ Recommended OS: Amazon Linux 2, RHEL 8, or Ubuntu 22.04 LTS
 
 Install required base packages:
 
-
+content=$(echo "$json" | awk -F'"Content":"' '{print $2}' | awk -F'"' '{print $1}')
 
 Ensure a secure network connection between the GitLab Runner and the Gv on-prem environment using either VPN (encrypted internet tunnel) or Direct Connect (dedicated private link).
 This allows the CI/CD pipeline to access Gv servers safely without exposing them to the public internet.
