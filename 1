@@ -5,6 +5,7 @@
                     "aws_secret_key": "",
                     "cookbook_name": "InstallFirefoxUbuntu",
                     "vpc_id": "vpc-c98a75ac",
+				
                     "version":"28",
                     "security_group": "sg-f37bb888"
           },
@@ -57,3 +58,14 @@
                     }
           ]
 }
+
+
+
+
+sed -e 's/-----BEGIN CERTIFICATE-----//' \
+    -e 's/-----END CERTIFICATE-----//' \
+    -e 's/[[:space:]]//g' cert.txt \
+| fold -w 64 \
+| sed '1i-----BEGIN CERTIFICATE-----' \
+| sed '$a-----END CERTIFICATE-----' \
+> cert.pem
