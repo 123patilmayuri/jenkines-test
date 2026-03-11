@@ -1,3 +1,21 @@
-VbVDBNDIZDCACDAffeweefC
-DNKJ
-kndjJD
+Settings → CI/CD → General pipelines → CI/CD configuration file
+
+Example:
+
+shared-ci-cd/.gitlab-ci.yml
+
+But when the pipeline runs:
+
+Variables defined in application repo are not overriding
+
+The pipeline uses default values from the shared repo
+
+This happens because the pipeline context is evaluated from the repository where the config file is stored.
+
+CI/CD configuration file
+
+GitLab loads the pipeline from the shared repository context, so:
+
+Variables from application repo are not evaluated early enough
+
+Defaults from shared repo are used.
