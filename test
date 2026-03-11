@@ -20,8 +20,25 @@ Variables from application repo are not evaluated early enough
 
 Defaults from shared repo are used.
 
-
+Feature	include project	include component	CI/CD settings pipeline
+Pipeline structure	Import YAML	Import reusable component	Use external pipeline file
+Customization	High	Medium	Low
+Versioning	Branch/tag	Semantic version	Branch/tag
+Inputs	Variables	Structured inputs	Variables only
+Add jobs in repo	✅ Yes	⚠️ Limited	❌ No
+Override shared jobs	✅ Yes	❌ Usually no	❌ No
+Best for	Shared pipelines	Modular reusable CI	Centralized governance
 include:
   - project: 'group/shared-ci-cd'
     ref: main
     file: '/gitlab-ci.yml'
+
+
+
+Recommendation (DevOps best practice)
+
+Shared pipeline templates → include project
+
+Reusable platform modules → include component
+
+Strict centralized pipelines → CI/CD settings
