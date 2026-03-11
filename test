@@ -19,3 +19,9 @@ GitLab loads the pipeline from the shared repository context, so:
 Variables from application repo are not evaluated early enough
 
 Defaults from shared repo are used.
+
+
+include:
+  - project: 'group/shared-ci-cd'
+    ref: main
+    file: '/gitlab-ci.yml'
