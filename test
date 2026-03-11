@@ -34,6 +34,12 @@ include:
     file: '/gitlab-ci.yml'
 
 
+Shared pipeline templates → include project
+
+Reusable platform modules → include component
+
+Strict centralized pipelines → CI/CD settings
+
 
 Recommendation (DevOps best practice)
 
