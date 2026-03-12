@@ -48,3 +48,21 @@ Shared pipeline templates → include project
 Reusable platform modules → include component
 
 Strict centralized pipelines → CI/CD settings
+
+
+
+
+
+
+The project keyword is used to include a CI/CD configuration file from another GitLab project (repository).
+
+Simple definition:
+project is used to import a .gitlab-ci.yml file from another GitLab project so that the same pipeline configuration can be reused.
+
+
+2. Component Definition (in include)
+
+The component keyword is used to include a predefined reusable CI/CD component from a component repository.
+
+Simple definition:
+component is used to include a reusable CI/CD pipeline component that performs a specific task, like build, test, or deploy.
