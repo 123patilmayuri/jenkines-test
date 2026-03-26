@@ -1,3 +1,121 @@
+| Aspect            | Pull Model                           | Push Model                   |
+| ----------------- | ------------------------------------ | ---------------------------- |
+| Network direction | Outbound only                        | Requires inbound             |
+| Security risk     | Runner on prod (code execution risk) | SSH exposure risk            |
+| Setup complexity  | Simple                               | Moderate to complex          |
+| Scalability       | Harder (many runners)                | Easier (centralized)         |
+| Control           | Distributed                          | Centralized                  |
+| Orchestration     | Limited                              | Strong                       |
+| Best for          | Restricted networks, simple setups   | Enterprise-scale deployments |
+
+
+🧠 When to choose what
+Choose Pull Model if:
+You cannot open inbound ports (strict firewall)
+You want simplest deployment setup
+You’re deploying to few servers
+You can strictly control pipelines and runners
+Choose Push Model if:
+You need scalable, multi-server deployments
+You want centralized control and audit
+You use infra tools (Ansible, Kubernetes, etc.)
+You want better isolation from CI
+
+
+
+=============
+
+Pull Model
+
+(GitLab Runner installed on target/on-prem server)
+
+✅ Pros
+No inbound access required
+Target server only needs outbound access to GitLab (more firewall-friendly).
+Stronger security posture (network-wise)
+No SSH ports or deploy endpoints exposed.
+Closer to “zero-trust” model
+Server pulls jobs; nothing externally forces execution.
+Simpler infra
+No jump hosts, SSH key distribution, or remote orchestration needed.
+Execution happens locally
+Faster deployments (no file transfer over SSH).
+Good for restricted environments
+Works well in banking/enterprise networks (common in Capco-type setups).
+❌ Cons
+Security risk of runner
+Runner executes pipeline code → effectively remote code execution on server.
+Tight coupling
+CI logic and production server are directly linked.
+Harder to centralize control
+Each server needs runner setup, updates, monitoring.
+Scaling complexity
+Many servers = many runners to manage.
+Limited orchestration
+Not ideal for multi-server coordinated deployments.
+Debugging can be harder
+Issues happen directly on prod machine.
+🚀 Push Model
+
+(Central GitLab runner pushes via SSH / Ansible / scripts)
+
+✅ Pros
+Better separation of concerns
+CI runner ≠ production server.
+Stronger control & audit
+All deployments originate from centralized pipeline runners.
+Safer production environment
+No CI execution engine installed on prod.
+Easier orchestration
+Can deploy to multiple servers in sequence or parallel.
+Scales better
+One runner can manage many servers.
+More flexible tooling
+Works well with Ansible, Terraform, Kubernetes, etc.
+❌ Cons
+Requires inbound access
+SSH or agent access must be opened → security concern.
+Credential management overhead
+SSH keys, vaults, rotation, etc.
+More moving parts
+Jump hosts, bastions, orchestration layers.
+Network dependency
+If connection fails, deployment fails.
+Slower deployments (sometimes)
+File transfer + remote execution overhead.
+⚖️ Quick Comparison
+Aspect	Pull Model	Push Model
+Network direction	Outbound only	Requires inbound
+Security risk	Runner on prod (code execution risk)	SSH exposure risk
+Setup complexity	Simple	Moderate to complex
+Scalability	Harder (many runners)	Easier (centralized)
+Control	Distributed	Centralized
+Orchestration	Limited	Strong
+Best for	Restricted networks, simple setups	Enterprise-scale deployments
+🧠 When to choose what
+Choose Pull Model if:
+You cannot open inbound ports (strict firewall)
+You want simplest deployment setup
+You’re deploying to few servers
+You can strictly control pipelines and runners
+Choose Push Model if:
+You need scalable, multi-server deployments
+You want centralized control and audit
+You use infra tools (Ansible, Kubernetes, etc.)
+You want better isolation from CI
+🧩 Practical Insight (important)
+
+Most mature setups actually use a hybrid approach:
+
+Build → centralized runner
+Deploy → push via orchestrator OR controlled pull agents
+
+If you want, I can map this specifically to a banking/enterprise architecture (with bastion hosts, vaults, etc.), which is usually what Capco projects expect.
+
+
+=================
+
+
 Option 1: GitLab Runner on the Target Server is the closest GitLab equivalent to a classic pull-based deployment model.
 
 In this setup, you install a self-managed GitLab Runner directly on the target VM or application server. That runner stays registered to GitLab and polls GitLab for matching jobs, so the deployment is initiated by the server-side runner picking up work rather than by an external CI worker pushing into the box. GitLab runners are designed to register with GitLab and then pick up jobs from the queue using their runner authentication token.
