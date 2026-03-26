@@ -1,3 +1,30 @@
+Option 1: GitLab Runner on the Target Server is the closest GitLab equivalent to a classic pull-based deployment model.
+
+In this setup, you install a self-managed GitLab Runner directly on the target VM or application server. That runner stays registered to GitLab and polls GitLab for matching jobs, so the deployment is initiated by the server-side runner picking up work rather than by an external CI worker pushing into the box. GitLab runners are designed to register with GitLab and then pick up jobs from the queue using their runner authentication token.
+
+
+Why this feels like a pull model
+
+The target server maintains the runner and keeps the connection to GitLab. Operationally, that means:
+
+no inbound SSH from a separate CI box is required for deployment in the common case
+the deployment executes on the destination host itself
+the host effectively “pulls” runnable work from GitLab’s queue via the runner model, rather than being directly pushed to by another machine
+
+
+
+ecommended implementation pattern
+
+For a production-safe version of this option:
+
+Use a dedicated project or group runner
+Add a unique tag like prod-deploy
+Mark it for deployments only
+Restrict deploy jobs to protected branches/tags
+Prefer minimal local privileges
+Consider whether shell executor is acceptable; GitLab also supports other executors such as Docker, depending on how isolated you want the job environment to be.
+
+
 | Aspect       | GitLab (Push)                | Nolio (Pull)                 |
 | ------------ | ---------------------------- | ---------------------------- |
 | Execution    | From CI/CD pipeline          | From agent on server         |
