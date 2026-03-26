@@ -1,68 +1,67 @@
-Settings → CI/CD → General pipelines → CI/CD configuration file
-
-Example:
-
-shared-ci-cd/.gitlab-ci.yml
-
-But when the pipeline runs:
-
-Variables defined in application repo are not overriding
-
-The pipeline uses default values from the shared repo
-
-This happens because the pipeline context is evaluated from the repository where the config file is stored.
-
-CI/CD configuration file
-
-GitLab loads the pipeline from the shared repository context, so:
-
-Variables from application repo are not evaluated early enough
-
-Defaults from shared repo are used.
-
-Feature	include project	include component	CI/CD settings pipeline
-Pipeline structure	Import YAML	Import reusable component	Use external pipeline file
-Customization	High	Medium	Low
-Versioning	Branch/tag	Semantic version	Branch/tag
-Inputs	Variables	Structured inputs	Variables only
-Add jobs in repo	✅ Yes	⚠️ Limited	❌ No
-Override shared jobs	✅ Yes	❌ Usually no	❌ No
-Best for	Shared pipelines	Modular reusable CI	Centralized governance
-include:
-  - project: 'group/shared-ci-cd'
-    ref: main
-    file: '/gitlab-ci.yml'
+Nolio (Pull-based)
+Uses agents installed on target servers.
+Agents poll the Nolio server for deployment instructions.
+When a deployment is triggered:
+Agent pulls artifacts and executes locally.
+No inbound connection needed
 
 
-Shared pipeline templates → include project
+=======================================
+1. Security
+Runner has direct access to server
+Be careful:
+Limit who can trigger pipelines
+Use protected branches
 
-Reusable platform modules → include component
+2. Tag Control (Very Important)
+Tags ensure:
+Job goes to correct server
+Without tags → wrong server might pick job
 
-Strict centralized pipelines → CI/CD settings
+3. Scaling
+Multiple servers = multiple runners
+Each server = its own execution node
+
+4.✅ When to Use This Approach
+
+Use Runner-on-server when:
+
+🔐 No inbound SSH allowed
+🏢 Strict on-prem firewall
+🔄 Want agent-like behavior (like Nolio)
+⚡ Need local execution
+
+You have many dynamic environments (hard to manage runners)
+
+Flow:
+
+Deployment triggered → Agent checks → Pulls package → Deploys
 
 
-Recommendation (DevOps best practice)
-
-Shared pipeline templates → include project
-
-Reusable platform modules → include component
-
-Strict centralized pipelines → CI/CD settings
+Aspect	GitLab (Push)	Nolio (Pull)
+Execution	From CI/CD pipeline	From agent on server
+Connectivity	Requires access to servers	Server connects out
+Security	Needs SSH/credentials	Safer in restricted networks
+Control	Centralized	Decentralized
+Network	Needs inbound access	Works with outbound-only
 
 
 
+Why this is considered pull-based
+
+It is called pull-based from the target environment perspective because:
+
+GitLab does not need SSH into the server
+The target server initiates communication to GitLab
+The target server also initiates communication to Nexus
+No one is remotely pushing binaries into the server over SSH
+
+So the network pattern becomes:
 
 
+What ports are usually involved
 
-The project keyword is used to include a CI/CD configuration file from another GitLab project (repository).
+In this model, the target server usually needs outbound access to:
 
-Simple definition:
-project is used to import a .gitlab-ci.yml file from another GitLab project so that the same pipeline configuration can be reused.
-
-
-2. Component Definition (in include)
-
-The component keyword is used to include a predefined reusable CI/CD component from a component repository.
-
-Simple definition:
-component is used to include a reusable CI/CD pipeline component that performs a specific task, like build, test, or deploy.
+GitLab over HTTPS for runner communication, job polling, status, and logs. GitLab Runner communicates with GitLab to execute CI/CD jobs.
+Nexus over HTTP/HTTPS to download artifacts through repository URLs or APIs. Sonatype documents Nexus APIs and CI/CD integrations for artifact workflows.
