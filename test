@@ -1,9 +1,59 @@
+| Aspect       | GitLab (Push)                | Nolio (Pull)                 |
+| ------------ | ---------------------------- | ---------------------------- |
+| Execution    | From CI/CD pipeline          | From agent on server         |
+| Connectivity | Requires access *to* servers | Server connects *out*        |
+| Security     | Needs SSH/credentials        | Safer in restricted networks |
+| Control      | Centralized                  | Decentralized                |
+| Network      | Needs inbound access         | Works with outbound-only     |
+
+Core Difference: Deployment Model
+
+============================
+GitLab (Push-based)
+Deployment is triggered from GitLab CI/CD pipelines.
+The runner (or pipeline job) pushes code/artifacts to target servers.
+Typically uses:
+SSH
+Kubernetes API
+Deployment scripts (Ansible, etc.)
+
+Flow:
+
+Code commit → Pipeline runs → GitLab Runner → Push to server
+
+
 Nolio (Pull-based)
 Uses agents installed on target servers.
 Agents poll the Nolio server for deployment instructions.
 When a deployment is triggered:
 Agent pulls artifacts and executes locally.
 No inbound connection needed
+
+✅ Option 1: GitLab Runner on Target Server (Closest to Pull Model)
+Install a GitLab Runner directly on the server.
+Configure it with a specific tag.
+Jobs run on that server itself.
+
+
+Option 3: Hybrid with Artifact Repositories
+Pipeline pushes artifact to repo (e.g., Nexus, S3)
+Servers pull from repo via scheduled jobs
+
+
+===============
+
+Traditional GitLab (push)
+Runner sits somewhere else
+Connects via SSH → pushes to server
+Runner-on-server (pull-like)
+Server itself runs the job
+No inbound connection needed
+
+👉 This solves:
+
+Firewall restrictions
+No SSH access required
+More secure environments
 
 
 =======================================
